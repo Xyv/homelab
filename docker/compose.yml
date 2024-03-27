@@ -6,6 +6,7 @@ secrets:
     file: ${DOCKER_CONFIG_DIR}/secrets/duckdns_token.secrets
 
 networks:
+  default:
   proxy:
     name: proxy
 
