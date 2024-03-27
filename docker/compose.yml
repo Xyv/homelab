@@ -80,7 +80,7 @@ services:
       # LOGGING
       - --log=true
       - --log.filePath=/logs/traefik.log
-      - --log.level=${LOG_LEVEL}
+      - --log.level=${TRAEFIK_LOG_LEVEL}
       - --accessLog=true
       - --accessLog.filePath=/logs/access.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
