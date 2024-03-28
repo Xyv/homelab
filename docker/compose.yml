@@ -24,8 +24,8 @@ services:
     secrets:
       - duckdns_token
     ports:
-      - 80/tcp
-      - 443/tcp
+      - "80:80"
+      - "443:443"
     environment:
       TZ: ${TZ}
       DUCKDNS_TOKEN_FILE: /run/secrets/duckdns_token
