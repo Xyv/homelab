@@ -61,11 +61,11 @@ services:
       - --certificatesresolvers.staging.acme.storage=${CERTS_STORAGE}
       - --certificatesresolvers.staging.acme.dnschallenge=true
       - --certificatesresolvers.staging.acme.dnschallenge.provider=${CERTS_PROVIDER}
-      # For some reason the container does not have dns resolution, pass it the local dns server for proper name resolution
-      - --certificatesresolvers.staging.acme.dnschallenge.resolvers=${NS1}:53
-      # In some cases this is still not enough, we need to bypass the normal propagation check wait, and just wait for a 1 min
-      - --certificatesresolvers.staging.acme.dnschallenge.disablePropagationCheck=true
-      - --certificatesresolvers.staging.acme.dnschallenge.delayBeforeCheck=60
+      # # For some reason the container does not have dns resolution, pass it the local dns server for proper name resolution
+      # - --certificatesresolvers.staging.acme.dnschallenge.resolvers=${NS1}:53
+      # # In some cases this is still not enough, we need to bypass the normal propagation check wait, and just wait for a 1 min
+      # - --certificatesresolvers.staging.acme.dnschallenge.disablePropagationCheck=true
+      # - --certificatesresolvers.staging.acme.dnschallenge.delayBeforeCheck=60
       ## Production
       - --certificatesresolvers.production.acme.caserver=${CERTS_PROD_CA_SERVER}
       - --certificatesresolvers.production.acme.email=${CERTS_EMAIL}
@@ -73,14 +73,13 @@ services:
       - --certificatesresolvers.production.acme.storage=${CERTS_STORAGE}
       - --certificatesresolvers.production.acme.dnschallenge=true
       - --certificatesresolvers.production.acme.dnschallenge.provider=${CERTS_PROVIDER}
-      # For some reason the container does not have dns resolution, pass it the local dns server for proper name resolution
-      - --certificatesresolvers.production.acme.dnschallenge.resolvers=${NS1}:53
-      # In some cases this is still not enough, we need to bypass the normal propagation check wait, and just wait for a 1 min
-      - --certificatesresolvers.production.acme.dnschallenge.disablePropagationCheck=true
-      - --certificatesresolvers.production.acme.dnschallenge.delayBeforeCheck=60
+      # # For some reason the container does not have dns resolution, pass it the local dns server for proper name resolution
+      # - --certificatesresolvers.production.acme.dnschallenge.resolvers=${NS1}:53
+      # # In some cases this is still not enough, we need to bypass the normal propagation check wait, and just wait for a 1 min
+      # - --certificatesresolvers.production.acme.dnschallenge.disablePropagationCheck=true
+      # - --certificatesresolvers.production.acme.dnschallenge.delayBeforeCheck=60
       # LOGGING
       - --log=true
-      - --log.filePath=/logs/traefik.log
       - --log.level=${TRAEFIK_LOG_LEVEL}
       - --accessLog=true
       - --accessLog.filePath=/logs/access.log
