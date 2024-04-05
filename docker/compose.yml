@@ -181,3 +181,43 @@ services:
       traefik.http.routers.calibre-web.middlewares: kobo-sync-headers
     networks:
       proxy:
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: ${PROJECT_NAME}-prowlarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/prowlarr:/config:rw
+      # - ${DOCKERNASSTORAGEDIR}:/data
+    labels:
+      traefik.enable: true
+      traefik.http.routers.prowlarr.entrypoints: websecure
+    networks:
+      proxy:
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: ${PROJECT_NAME}-readarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/readarr:/config:rw
+      - nfs_books:/data/media/books:rw
+    labels:
+      traefik.enable: true
+      traefik.http.routers.readarr.entrypoints: websecure
+    networks:
+      proxy:
+    depends_on:
+      - prowlarr
