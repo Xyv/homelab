@@ -135,25 +135,25 @@ services:
     networks:
       proxy:
 
-  # calibre:
-  #   image: lscr.io/linuxserver/calibre:${CALIBRE_VERSION}
-  #   container_name: ${PROJECT_NAME}-calibre
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges=true
-  #   environment:
-  #     PUID: ${PUID}
-  #     PGID: ${PGID}
-  #     TZ: ${TZ}
-  #   volumes:
-  #     - ${DOCKER_CONFIG_DIR}/calibre/config:/config:rw
-  #     - nfs_books:/data/media/books:rw
-  #   labels:
-  #     traefik.enable: true
-  #     traefik.http.routers.calibre.entrypoints: websecure
-  #     traefik.http.services.calibre.loadbalancer.server.port: 8080
-  #   networks:
-  #     proxy:
+  calibre:
+    image: lscr.io/linuxserver/calibre:${CALIBRE_VERSION}
+    container_name: ${PROJECT_NAME}-calibre
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/calibre/config:/config:rw
+      - nfs_books:/data/media/books:rw
+    labels:
+      traefik.enable: true
+      traefik.http.routers.calibre.entrypoints: websecure
+      traefik.http.services.calibre.loadbalancer.server.port: 8080
+    networks:
+      proxy:
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:${CALIBRE_WEB_VERSION}
