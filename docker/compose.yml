@@ -172,6 +172,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.calibre-web.entrypoints: websecure
+      traefik.http.routers.calibre-web.rule: Host(`books.${DOMAIN_NAME}`)
       traefik.http.services.calibre-web.loadbalancer.server.port: 8083
       # Creates a middleware that adds in a header to tell Calibre-Web the X-Scheme is https
       # (this is similar to the nginx examples) and required for Kobo Sync
