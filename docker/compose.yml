@@ -173,5 +173,10 @@ services:
       traefik.enable: true
       traefik.http.routers.calibre-web.entrypoints: websecure
       traefik.http.services.calibre-web.loadbalancer.server.port: 8083
+      # Creates a middleware that adds in a header to tell Calibre-Web the X-Scheme is https
+      # (this is similar to the nginx examples) and required for Kobo Sync
+      traefik.http.middlewares.kobo-sync-headers.headers.customrequestheaders.X-Scheme: https
+      # traefik.http.routers.calibre-web.middlewares: secure-headers,kobo-sync-headers
+      traefik.http.routers.calibre-web.middlewares: kobo-sync-headers
     networks:
       proxy:
