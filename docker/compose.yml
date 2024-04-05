@@ -41,6 +41,7 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=proxy
+      - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${DOMAIN_NAME}`)
       # Entrypoints definition
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
@@ -91,7 +92,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       traefik.enable: true
-      traefik.http.routers.traefik.rule: Host(`traefik.${DOMAIN_NAME}`)
       traefik.http.routers.traefik.entrypoints: websecure
       traefik.http.routers.traefik.service: api@internal
 
@@ -103,7 +103,6 @@ services:
       - no-new-privileges:true
     labels:
       traefik.enable: true
-      traefik.http.routers.whoami.rule: Host(`whoami.${DOMAIN_NAME}`)
       traefik.http.routers.whoami.entrypoints: websecure
     networks:
       - proxy
