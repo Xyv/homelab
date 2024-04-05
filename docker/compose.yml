@@ -87,7 +87,8 @@ services:
       - --log=true
       - --log.level=${TRAEFIK_LOG_LEVEL}
       - --accessLog=true
-      # - --accessLog.filters.statusCodes=204-299,400-499,500-599
+      # - --accessLog.bufferingSize=100 # Only useful when logging to file, keep buffersingSize in RAM before saving to disk
+      - --accessLog.filters.statusCodes=204-299,400-499,500-599 # Don't log successful and redirect connections
     networks:
       proxy:
       socket_proxy:
