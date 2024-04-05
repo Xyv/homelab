@@ -15,6 +15,13 @@ networks:
 volumes:
   letsencrypt_certificates:
     name: letsencrypt_certificates
+  nfs_books:
+    driver: local
+    name: books    # this is the name of the volume in /var/lib/docker/volumes
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=${NAS_IP},rw
+      device: ":${BOOKS_DIR}"
 
 services:
   traefik:
@@ -125,5 +132,46 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.entrypoints: websecure
+    networks:
+      proxy:
+
+  # calibre:
+  #   image: lscr.io/linuxserver/calibre:${CALIBRE_VERSION}
+  #   container_name: ${PROJECT_NAME}-calibre
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - no-new-privileges=true
+  #   environment:
+  #     PUID: ${PUID}
+  #     PGID: ${PGID}
+  #     TZ: ${TZ}
+  #   volumes:
+  #     - ${DOCKER_CONFIG_DIR}/calibre/config:/config:rw
+  #     - nfs_books:/data/media/books:rw
+  #   labels:
+  #     traefik.enable: true
+  #     traefik.http.routers.calibre.entrypoints: websecure
+  #     traefik.http.services.calibre.loadbalancer.server.port: 8080
+  #   networks:
+  #     proxy:
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:${CALIBRE_WEB_VERSION}
+    container_name: ${PROJECT_NAME}-calibre-web
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DOCKER_MODS: linuxserver/mods:universal-calibre
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/calibre/calibre-web:/config:rw
+      - nfs_books:/data/media/books:rw
+    labels:
+      traefik.enable: true
+      traefik.http.routers.calibre-web.entrypoints: websecure
+      traefik.http.services.calibre-web.loadbalancer.server.port: 8083
     networks:
       proxy:
