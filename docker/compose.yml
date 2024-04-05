@@ -54,6 +54,7 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
       # Domain name And TLS config
+      # - --entrypoints.websecure.forwardedHeaders.trustedIPs=$REMOTE_IPS,$LOCAL_IPS # Set REMOTE_IPS to VPS IP
       - --entrypoints.websecure.http.tls.certresolver=${CERTS_RESOLVER}
       - --entrypoints.websecure.http.tls.domains=${DOMAIN_NAME}
       - --entrypoints.websecure.http.tls.domains[0].main=${DOMAIN_NAME}
