@@ -107,6 +107,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
     environment:
+      TZ: ${TZ}
       LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
       CONTAINERS: 1
       IMAGES: 1
@@ -114,9 +115,10 @@ services:
       - no-new-privileges=true
     networks:
       socket_proxy:
+
   whoami:
     image: traefik/whoami
-    container_name: whoami
+    container_name: ${PROJECT_NAME}-whoami
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -124,4 +126,4 @@ services:
       traefik.enable: true
       traefik.http.routers.whoami.entrypoints: websecure
     networks:
-      - proxy
+      proxy:
