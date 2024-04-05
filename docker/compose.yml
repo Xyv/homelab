@@ -9,6 +9,8 @@ networks:
   default:
   proxy:
     name: proxy
+  socket_proxy:
+    name: socket_proxy
 
 volumes:
   letsencrypt_certificates:
@@ -34,13 +36,15 @@ services:
       - --global.sendAnonymousUsage=false
       # Activate api and dashboard
       - --api=true
-      - --api.debug=true
+      - --api.debug=false
       - --api.insecure=false
       - --api.dashboard=true
       # Listen to docker provider but don't activate traefik by default
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=proxy
+      # Use docker-socket-proxy to avoid exposing the full socket, see https://doc.traefik.io/traefik/providers/docker/#docker-api-access
+      - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
       - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${DOMAIN_NAME}`)
       # Entrypoints definition
       - --entrypoints.web.address=:80
@@ -85,16 +89,29 @@ services:
       - --accessLog=true
       # - --accessLog.filters.statusCodes=204-299,400-499,500-599
     networks:
-      - proxy
+      proxy:
+      socket_proxy:
     volumes:
       - letsencrypt_certificates:/certs
-      # TODO: Do not directly expose the docker socket, see https://doc.traefik.io/traefik/providers/docker/#docker-api-access
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       traefik.enable: true
       traefik.http.routers.traefik.entrypoints: websecure
       traefik.http.routers.traefik.service: api@internal
 
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy
+    container_name: ${PROJECT_NAME}-docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    environment:
+      LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
+      CONTAINERS: 1
+      IMAGES: 1
+    security_opt:
+      - no-new-privileges=true
+    networks:
+      socket_proxy:
   whoami:
     image: traefik/whoami
     container_name: whoami
