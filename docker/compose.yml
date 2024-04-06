@@ -103,42 +103,17 @@ services:
       file: ./compose/calibre.yml
     <<: *common-keys-apps
 
+  ############### MEDIA Services
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr
-    container_name: ${PROJECT_NAME}-prowlarr
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges=true
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    volumes:
-      - ${DOCKER_CONFIG_DIR}/prowlarr:/config:rw
-      # - ${DOCKERNASSTORAGEDIR}:/data
-    labels:
-      traefik.enable: true
-      traefik.http.routers.prowlarr.entrypoints: websecure
-    networks:
-      proxy:
+    extends:
+      service: prowlarr
+      file: ./compose/prowlarr.yml
+    <<: *common-keys-media
 
   readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: ${PROJECT_NAME}-readarr
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges=true
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    volumes:
-      - ${DOCKER_CONFIG_DIR}/readarr:/config:rw
-      - nfs_books:/data/media/books:rw
-    labels:
-      traefik.enable: true
-      traefik.http.routers.readarr.entrypoints: websecure
-    networks:
-      proxy:
+    extends:
+      service: readarr
+      file: ./compose/readarr.yml
+    <<: *common-keys-media
     depends_on:
       - prowlarr

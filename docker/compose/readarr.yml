@@ -1,0 +1,10 @@
+services:
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: ${PROJECT_NAME}-readarr
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/readarr:/config:rw
+      - nfs_books:/data/media/books:rw
+    labels:
+      traefik.enable: true
+      traefik.http.routers.readarr.entrypoints: websecure

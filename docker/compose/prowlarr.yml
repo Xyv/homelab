@@ -1,0 +1,10 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: ${PROJECT_NAME}-prowlarr
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/prowlarr:/config:rw
+      # - ${DOCKERNASSTORAGEDIR}:/data
+    labels:
+      traefik.enable: true
+      traefik.http.routers.prowlarr.entrypoints: websecure
