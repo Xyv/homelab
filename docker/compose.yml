@@ -23,11 +23,21 @@ volumes:
       o: nfsvers=4,addr=${NAS_IP},rw
       device: ":${BOOKS_DIR}"
 
-include:
-  - ./compose/docker-socket-proxy.yml
-  - ./compose/traefik.yml
+# include:
+#   - ./compose/docker-socket-proxy.yml
+#   - ./compose/traefik.yml
 
 services:
+  traefik:
+    extends:
+      service: traefik
+      file: ./compose/traefik.yml
+
+  docker-socket-proxy:
+    extends:
+      service: docker-socket-proxy
+      file: ./compose/docker-socket-proxy.yml
+
   whoami:
     image: traefik/whoami
     container_name: ${PROJECT_NAME}-whoami
