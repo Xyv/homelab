@@ -2,14 +2,17 @@ services:
   traefik:
     image: traefik:${TRAEFIK_VERSION}
     container_name: ${PROJECT_NAME}-traefik
-    restart: always
     security_opt:
       - no-new-privileges:true
-    secrets:
-      - duckdns_token
+    restart: always
     ports:
       - "80:80"
       - "4443:443"
+    networks:
+      proxy:
+      socket_proxy: 
+    secrets:
+      - duckdns_token
     environment:
       TZ: ${TZ}
       DUCKDNS_TOKEN_FILE: /run/secrets/duckdns_token
@@ -72,9 +75,6 @@ services:
       - --accessLog=true
       # - --accessLog.bufferingSize=100 # Only useful when logging to file, keep buffersingSize in RAM before saving to disk
       - --accessLog.filters.statusCodes=204-299,400-499,500-599 # Don't log successful and redirect connections
-    networks:
-      proxy:
-      socket_proxy: 
     volumes:
       - letsencrypt_certificates:/certs
     labels:
