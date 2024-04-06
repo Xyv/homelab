@@ -24,7 +24,8 @@ x-common-keys-core: &common-keys-core
   <<: *common-key-security
   restart: always
   profiles:
-  - core
+    - all
+    - core
 
 # Keys common to some of the dependent services/apps
 x-common-keys-apps: &common-keys-apps
@@ -35,7 +36,8 @@ x-common-keys-apps: &common-keys-apps
   environment:
     <<: *default-tz-puid-pgid
   profiles:
-  - apps
+    - all
+    - apps
 
 # Keys common to some of the services in media-services.txt
 x-common-keys-media: &common-keys-media
@@ -46,7 +48,8 @@ x-common-keys-media: &common-keys-media
   environment:
     <<: *default-tz-puid-pgid
   profiles:
-  - media
+    - all
+    - media
 
 networks:
   default:
