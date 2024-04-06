@@ -1,0 +1,16 @@
+services:
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy
+    container_name: ${PROJECT_NAME}-docker-socket-proxy
+    security_opt:
+      - no-new-privileges=true
+    restart: always
+    networks:
+      socket_proxy:
+    environment:
+      TZ: ${TZ}
+      LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
+      CONTAINERS: 1
+      IMAGES: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
