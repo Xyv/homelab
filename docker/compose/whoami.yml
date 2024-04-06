@@ -1,0 +1,9 @@
+services:
+  whoami:
+    image: traefik/whoami
+    container_name: ${PROJECT_NAME}-whoami
+    environment:
+      TZ: ${TZ}
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.entrypoints: websecure

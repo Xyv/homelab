@@ -25,8 +25,8 @@ x-common-keys-core: &common-keys-core
   networks:
     proxy:
   restart: always
-  # profiles:
-  # - core
+  profiles:
+  - core
 
 # Keys common to some of the dependent services/apps
 x-common-keys-apps: &common-keys-apps
@@ -82,16 +82,10 @@ services:
     <<: *common-keys-core
 
   whoami:
-    image: traefik/whoami
-    container_name: ${PROJECT_NAME}-whoami
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    labels:
-      traefik.enable: true
-      traefik.http.routers.whoami.entrypoints: websecure
-    networks:
-      proxy:
+    extends:
+      service: whoami
+      file: ./compose/whoami.yml
+    <<: *common-keys-apps
 
   calibre:
     image: lscr.io/linuxserver/calibre:${CALIBRE_VERSION}
