@@ -5,6 +5,47 @@ secrets:
   duckdns_token:
     file: ${DOCKER_CONFIG_DIR}/secrets/duckdns_token.secrets
 
+########################### EXTENSION FIELDS
+# Helps eliminate repetition of sections
+# More Info on how to use this: https://github.com/htpcBeginner/docker-traefik/pull/228
+  
+# Common environment values
+x-environment: &default-tz-puid-pgid
+  TZ: $TZ
+  PUID: $PUID
+  PGID: $PGID
+  
+x-security: &common-key-security
+  security_opt:
+    - no-new-privileges
+
+# Keys common to some of the core services that we always to automatically restart on failure
+x-common-keys-core: &common-keys-core
+  <<: *common-key-security
+  networks:
+    proxy:
+  restart: always
+  # profiles:
+  # - core
+
+# Keys common to some of the dependent services/apps
+x-common-keys-apps: &common-keys-apps
+  <<: *common-key-security
+  networks:
+    proxy:
+  restart: unless-stopped
+  profiles:
+  - apps
+
+# Keys common to some of the services in media-services.txt
+x-common-keys-media: &common-keys-media
+  <<: *common-key-security
+  networks:
+    proxy:
+  restart: "no"
+  # profiles:
+  # - media
+
 networks:
   default:
   proxy:
@@ -32,11 +73,13 @@ services:
     extends:
       service: traefik
       file: ./compose/traefik.yml
+    <<: *common-keys-core
 
   docker-socket-proxy:
     extends:
       service: docker-socket-proxy
       file: ./compose/docker-socket-proxy.yml
+    <<: *common-keys-core
 
   whoami:
     image: traefik/whoami

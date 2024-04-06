@@ -2,9 +2,6 @@ services:
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy
     container_name: ${PROJECT_NAME}-docker-socket-proxy
-    security_opt:
-      - no-new-privileges=true
-    restart: always
     networks:
       socket_proxy:
     environment:
