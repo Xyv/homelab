@@ -29,20 +29,24 @@ x-common-keys-core: &common-keys-core
 # Keys common to some of the dependent services/apps
 x-common-keys-apps: &common-keys-apps
   <<: *common-key-security
+  restart: unless-stopped
   networks:
     proxy:
-  restart: unless-stopped
+  environment:
+    <<: *default-tz-puid-pgid
   profiles:
   - apps
 
 # Keys common to some of the services in media-services.txt
 x-common-keys-media: &common-keys-media
   <<: *common-key-security
+  restart: "no"
   networks:
     proxy:
-  restart: "no"
-  # profiles:
-  # - media
+  environment:
+    <<: *default-tz-puid-pgid
+  profiles:
+  - media
 
 networks:
   default:
@@ -67,6 +71,7 @@ volumes:
 #   - ./compose/traefik.yml
 
 services:
+  ############### CORE Services
   traefik:
     extends:
       service: traefik
@@ -79,6 +84,7 @@ services:
       file: ./compose/docker-socket-proxy.yml
     <<: *common-keys-core
 
+  ############### APPS Services
   whoami:
     extends:
       service: whoami
