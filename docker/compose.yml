@@ -22,8 +22,6 @@ x-security: &common-key-security
 # Keys common to some of the core services that we always to automatically restart on failure
 x-common-keys-core: &common-keys-core
   <<: *common-key-security
-  networks:
-    proxy:
   restart: always
   profiles:
   - core
