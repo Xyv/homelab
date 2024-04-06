@@ -8,13 +8,13 @@ secrets:
 ########################### EXTENSION FIELDS
 # Helps eliminate repetition of sections
 # More Info on how to use this: https://github.com/htpcBeginner/docker-traefik/pull/228
-  
+
 # Common environment values
 x-environment: &default-tz-puid-pgid
   TZ: $TZ
   PUID: $PUID
   PGID: $PGID
-  
+
 x-security: &common-key-security
   security_opt:
     - no-new-privileges
@@ -54,8 +54,10 @@ x-common-keys-media: &common-keys-media
 networks:
   default:
   proxy:
+    # Reverse proxy
     name: proxy
   socket_proxy:
+    # Docker socket proxy
     name: socket_proxy
 
 volumes:
