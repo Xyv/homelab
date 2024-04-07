@@ -4,6 +4,10 @@
 secrets:
   duckdns_token:
     file: ${DOCKER_CONFIG_DIR}/secrets/duckdns_token.secrets
+  email_user:
+    file: ${DOCKER_CONFIG_DIR}/secrets/email_user_mailapfr.secrets
+  email_password:
+    file: ${DOCKER_CONFIG_DIR}/secrets/email_password_mailapfr.secrets
 
 ########################### EXTENSION FIELDS
 # Helps eliminate repetition of sections
@@ -59,10 +63,14 @@ networks:
   socket_proxy:
     # Docker socket proxy
     name: socket_proxy
+  protonmail_bridge:
+    name: protonmail_bridge
 
 volumes:
   letsencrypt_certificates:
     name: letsencrypt_certificates
+  protonmail:
+    name: protonmail
   nfs_books:
     driver: local
     name: books    # this is the name of the volume in /var/lib/docker/volumes
@@ -88,6 +96,14 @@ services:
       service: docker-socket-proxy
       file: ./compose/docker-socket-proxy.yml
     <<: *common-keys-core
+
+  protonmail-bridge:
+    extends:
+      service: protonmail-bridge
+      file: ./compose/protonmail-bridge.yml
+    <<: *common-keys-core
+    networks:
+      protonmail:
 
   ############### APPS Services
   whoami:

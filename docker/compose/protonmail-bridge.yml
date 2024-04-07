@@ -1,0 +1,9 @@
+services:
+  protonmail-bridge:
+    image: shenxn/protonmail-bridge:3.9.1-1
+    container_name: ${PROJECT_NAME}-protonmail-bridge
+    # ports:
+    #   - 1025:25/tcp
+    #   - 1143:143/tcp
+    volumes:
+      - protonmail:/root
