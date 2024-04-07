@@ -41,11 +41,14 @@ x-common-keys-core: &common-keys-core
 
 # Keys common to some of the core services that we always to automatically restart on failure
 x-common-keys-authentik: &common-keys-authentik
-  <<: *common-keys-core
-  profiles:
-    - authentik
+  <<: *common-key-security
+  restart: always
   networks:
     oauth_backend:
+  profiles:
+    - all
+    - core
+    - authentik
 
 # Keys common to some of the dependent services/apps
 x-common-keys-apps: &common-keys-apps
@@ -81,9 +84,6 @@ networks:
     name: socket_proxy
   protonmail_bridge:
     name: protonmail_bridge
-  oauth:
-    # Authentication frontend
-    name: oauth
   oauth_backend:
     # Authentication backend
     name: oauth_backend
@@ -160,15 +160,12 @@ services:
       file: ./compose/authentik.yml
     <<: *common-keys-authentik
     networks:
-      oauth:
+      proxy:
       oauth_backend:
       protonmail_bridge:
     depends_on:
       - authentik-db
       - authentik-redis
-    ports:
-      - "9000:9000"
-      - "9443:9443"
 
   ############### APPS Services
   whoami:

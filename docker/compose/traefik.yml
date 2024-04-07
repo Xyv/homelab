@@ -7,7 +7,7 @@ services:
       - "4443:443"
     networks:
       proxy:
-      socket_proxy: 
+      socket_proxy:
     secrets:
       - duckdns_token
     environment:
