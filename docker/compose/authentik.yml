@@ -85,6 +85,10 @@ services:
       - ${DOCKER_CONFIG_DIR}/authentik/media:/media
       - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
     command: server
+    labels:
+      traefik.enable: true
+      traefik.http.routers.authentik.entrypoints: websecure
+      traefik.http.services.authentik.loadbalancer.server.port: 9000
 
   authentik-worker:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
