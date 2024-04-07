@@ -4,6 +4,14 @@
 secrets:
   duckdns_token:
     file: ${DOCKER_CONFIG_DIR}/secrets/duckdns_token.secrets
+  authentik_db_name:
+    file: ${DOCKER_CONFIG_DIR}/secrets/authentik_db_name.secrets
+  authentik_db_user:
+    file: ${DOCKER_CONFIG_DIR}/secrets/authentik_db_user.secrets
+  authentik_db_password:
+    file: ${DOCKER_CONFIG_DIR}/secrets/authentik_db_password.secrets
+  authentik_secret_key:
+    file: ${DOCKER_CONFIG_DIR}/secrets/authentik_secret_key.secrets
   email_user:
     file: ${DOCKER_CONFIG_DIR}/secrets/email_user_mailapfr.secrets
   email_password:
@@ -30,6 +38,14 @@ x-common-keys-core: &common-keys-core
   profiles:
     - all
     - core
+
+# Keys common to some of the core services that we always to automatically restart on failure
+x-common-keys-authentik: &common-keys-authentik
+  <<: *common-keys-core
+  profiles:
+    - authentik
+  networks:
+    oauth_backend:
 
 # Keys common to some of the dependent services/apps
 x-common-keys-apps: &common-keys-apps
@@ -65,12 +81,22 @@ networks:
     name: socket_proxy
   protonmail_bridge:
     name: protonmail_bridge
+  oauth:
+    # Authentication frontend
+    name: oauth
+  oauth_backend:
+    # Authentication backend
+    name: oauth_backend
 
 volumes:
   letsencrypt_certificates:
     name: letsencrypt_certificates
   protonmail:
     name: protonmail
+  authentik_database:
+    name: authentik_database
+  authentik_redis:
+    name: authentik_redis
   nfs_books:
     driver: local
     name: books    # this is the name of the volume in /var/lib/docker/volumes
@@ -82,6 +108,7 @@ volumes:
 # include:
 #   - ./compose/docker-socket-proxy.yml
 #   - ./compose/traefik.yml
+#   - ./compose/authentik.yml
 
 services:
   ############### CORE Services
@@ -104,6 +131,44 @@ services:
     <<: *common-keys-core
     networks:
       protonmail_bridge:
+
+  ############### Authentik Services
+  authentik-db:
+    extends:
+      service: authentik-db
+      file: ./compose/authentik.yml
+    <<: *common-keys-authentik
+
+  authentik-redis:
+    extends:
+      service: authentik-redis
+      file: ./compose/authentik.yml
+    <<: *common-keys-authentik
+
+  authentik-worker:
+    extends:
+      service: authentik-worker
+      file: ./compose/authentik.yml
+    <<: *common-keys-authentik
+    depends_on:
+      - authentik-db
+      - authentik-redis
+
+  authentik-server:
+    extends:
+      service: authentik-server
+      file: ./compose/authentik.yml
+    <<: *common-keys-authentik
+    networks:
+      oauth:
+      oauth_backend:
+      protonmail_bridge:
+    depends_on:
+      - authentik-db
+      - authentik-redis
+    ports:
+      - "9000:9000"
+      - "9443:9443"
 
   ############### APPS Services
   whoami:

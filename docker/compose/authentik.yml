@@ -1,0 +1,136 @@
+services:
+  authentik-db:
+    image: docker.io/library/postgres:${AUTHENTIK_PG_VERSION}
+    container_name: ${PROJECT_NAME}-authentik-db
+    secrets:
+      - authentik_db_name
+      - authentik_db_user
+      - authentik_db_password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/authentik_db_name
+      POSTGRES_USER_FILE: /run/secrets/authentik_db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/authentik_db_password
+    volumes:
+      - authentik_database:/var/lib/postgresql/data
+    shm_size: 128mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$(cat $${POSTGRES_DB_FILE}) -U $$(cat $${POSTGRES_USER_FILE})"]
+      start_period: 20s
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  # pgadmin4:
+  #   image: dpage/pgadmin4
+  #   container_name: ${PROJECT_NAME}-pgadmin
+  #   networks:
+  #     oauth_backend:
+  #     proxy:
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: test@mail.fr
+  #     PGADMIN_DEFAULT_PASSWORD: totallysecr3ts
+  #   labels:
+  #     traefik.enable: true
+  #     traefik.http.routers.pgadmin.entrypoints: websecure
+
+  authentik-redis:
+    image: docker.io/library/redis:${AUTHENTIK_REDIS_VERSION}
+    container_name: ${PROJECT_NAME}-authentik-redis
+    volumes:
+      - authentik_redis:/data
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+  # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+  # WARNING Your system is configured to use the 'xen' clocksource which might lead to degraded performance. Check the result of the [slow-clocksource] system check: run 'redis-server --check-system' to check if the system's clocksource isn't degrading performance.
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    container_name: ${PROJECT_NAME}-authentik-server
+    secrets:
+      - authentik_db_name
+      - authentik_db_user
+      - authentik_db_password
+      - authentik_secret_key
+      - email_user
+      - email_password
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__USER: "file:///run/secrets/authentik_db_user"
+      AUTHENTIK_POSTGRESQL__NAME: "file:///run/secrets/authentik_db_name"
+      AUTHENTIK_POSTGRESQL__PASSWORD: "file:///run/secrets/authentik_db_password"
+      # AUTHENTIK_ERROR_REPORTING__ENABLED: true # send reports to  https://sentry.io
+      AUTHENTIK_SECRET_KEY: "file:///run/secrets/authentik_secret_key"
+      AUTHENTIK_LOG_LEVEL: info # debug, info, warning, error.
+      # Email configuration
+      # SMTP Host Emails are sent to
+      AUTHENTIK_EMAIL__HOST: protonmail-bridge
+      AUTHENTIK_EMAIL__PORT: 25
+      # Optionally authenticate (don't add quotation marks to your password)
+      AUTHENTIK_EMAIL__USERNAME: "file:///run/secrets/email_user"
+      AUTHENTIK_EMAIL__PASSWORD: "file:///run/secrets/email_password"
+      # Use StartTLS
+      AUTHENTIK_EMAIL__USE_TLS: true
+      # Use SSL
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__TIMEOUT: 10
+      # Email address authentik will send from, should have a correct @domain
+      AUTHENTIK_EMAIL__FROM: authentik@mailap.fr
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/authentik/media:/media
+      - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
+    command: server
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    container_name: ${PROJECT_NAME}-authentik-worker
+    secrets:
+      - authentik_db_name
+      - authentik_db_user
+      - authentik_db_password
+      - authentik_secret_key
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__USER: "file:///run/secrets/authentik_db_user"
+      AUTHENTIK_POSTGRESQL__NAME: "file:///run/secrets/authentik_db_name"
+      AUTHENTIK_POSTGRESQL__PASSWORD: "file:///run/secrets/authentik_db_password"
+      AUTHENTIK_SECRET_KEY: "file:///run/secrets/authentik_secret_key"
+      AUTHENTIK_LOG_LEVEL: info # debug, info, warning, error.
+    # `user: root` and the docker socket volume are optional.
+    # See more for the docker socket integration here:
+    # https://goauthentik.io/docs/outposts/integrations/docker
+    # Removing `user: root` also prevents the worker from fixing the permissions
+    # on the mounted folders, so when removing this make sure the folders have the correct UID/GID
+    # (1000:1000 by default)
+    user: root
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_CONFIG_DIR}/authentik/media:/media
+      - ${DOCKER_CONFIG_DIR}/authentik/certs:/certs
+      - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
+    command: worker
+
+  # authentik-proxy:
+  #   image: ghcr.io/goauthentik/proxy:${AUTHENTIK_VERSION}
+  #   container_name: ${PROJECT_NAME}-authentik-proxy
+  #   environment:
+  #     AUTHENTIK_HOST: https://your-authentik.tld
+  #     AUTHENTIK_INSECURE: "false"
+  #     AUTHENTIK_TOKEN: token-generated-by-authentik
+  #     # Starting with 2021.9, you can optionally set this too
+  #     # when authentik_host for internal communication doesn't match the public URL
+  #     # AUTHENTIK_HOST_BROWSER: https://external-domain.tld
+  #   labels:
+  #     traefik.enable: true
+  #     traefik.port: 9000
+  #     traefik.http.routers.authentik.rule: Host(`app.company`) && PathPrefix(`/outpost.goauthentik.io/`)
+  #     # `authentik-proxy` refers to the service name in the compose file.
+  #     traefik.http.middlewares.authentik.forwardauth.address: http://authentik-proxy:9000/outpost.goauthentik.io/auth/traefik
+  #     traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+  #     traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
