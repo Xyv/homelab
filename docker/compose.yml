@@ -103,7 +103,7 @@ services:
       file: ./compose/protonmail-bridge.yml
     <<: *common-keys-core
     networks:
-      protonmail:
+      protonmail_bridge:
 
   ############### APPS Services
   whoami:
