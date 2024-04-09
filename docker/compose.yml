@@ -154,9 +154,9 @@ services:
       - authentik-db
       - authentik-redis
 
-  authentik-server:
+  authentik:
     extends:
-      service: authentik-server
+      service: authentik
       file: ./compose/authentik.yml
     <<: *common-keys-authentik
     networks:

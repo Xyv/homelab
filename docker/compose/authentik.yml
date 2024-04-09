@@ -48,7 +48,7 @@ services:
   # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
   # WARNING Your system is configured to use the 'xen' clocksource which might lead to degraded performance. Check the result of the [slow-clocksource] system check: run 'redis-server --check-system' to check if the system's clocksource isn't degrading performance.
 
-  authentik-server:
+  authentik:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
     container_name: ${PROJECT_NAME}-authentik-server
     secrets:
@@ -88,6 +88,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.authentik.entrypoints: websecure
+      traefik.http.routers.authentik.rule: Host(`auth.${DOMAIN_NAME}`)
       traefik.http.services.authentik.loadbalancer.server.port: 9000
 
   authentik-worker:
@@ -120,11 +121,13 @@ services:
       - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
     command: worker
 
+  # Manual proxy outpost is not needed probably
+  # We can use the embedded docker outpost
   # authentik-proxy:
   #   image: ghcr.io/goauthentik/proxy:${AUTHENTIK_VERSION}
   #   container_name: ${PROJECT_NAME}-authentik-proxy
   #   environment:
-  #     AUTHENTIK_HOST: https://your-authentik.tld
+  #     AUTHENTIK_HOST: https://auth.${DOMAIN_NAME}
   #     AUTHENTIK_INSECURE: "false"
   #     AUTHENTIK_TOKEN: token-generated-by-authentik
   #     # Starting with 2021.9, you can optionally set this too
