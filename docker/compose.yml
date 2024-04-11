@@ -12,6 +12,10 @@ secrets:
     file: ${DOCKER_CONFIG_DIR}/secrets/authentik_db_password.secrets
   authentik_secret_key:
     file: ${DOCKER_CONFIG_DIR}/secrets/authentik_secret_key.secrets
+  geoipupdate_account_id:
+    file: ${DOCKER_CONFIG_DIR}/secrets/geoipupdate_account_id.secrets
+  geoipupdate_license_key:
+    file: ${DOCKER_CONFIG_DIR}/secrets/geoipupdate_license_key.secrets
   email_user:
     file: ${DOCKER_CONFIG_DIR}/secrets/email_user_mailapfr.secrets
   email_password:
@@ -97,6 +101,8 @@ volumes:
     name: authentik_database
   authentik_redis:
     name: authentik_redis
+  geoip:
+    name: authentik_geoip
   nfs_books:
     driver: local
     name: books    # this is the name of the volume in /var/lib/docker/volumes
@@ -153,6 +159,12 @@ services:
     depends_on:
       - authentik-db
       - authentik-redis
+
+  authentik-geoip:
+    extends:
+      service: authentik-geoip
+      file: ./compose/authentik.yml
+    <<: *common-keys-authentik
 
   authentik:
     extends:

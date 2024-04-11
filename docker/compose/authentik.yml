@@ -48,6 +48,20 @@ services:
   # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
   # WARNING Your system is configured to use the 'xen' clocksource which might lead to degraded performance. Check the result of the [slow-clocksource] system check: run 'redis-server --check-system' to check if the system's clocksource isn't degrading performance.
 
+  authentik-geoip:
+    image: maxmindinc/geoipupdate:latest
+    container_name: ${PROJECT_NAME}-authentik-geoip
+    secrets:
+      - geoipupdate_account_id
+      - geoipupdate_license_key
+    environment:
+      GEOIPUPDATE_ACCOUNT_ID_FILE: /run/secrets/geoipupdate_account_id
+      GEOIPUPDATE_LICENSE_KEY_FILE: /run/secrets/geoipupdate_license_key
+      GEOIPUPDATE_EDITION_IDS: "GeoLite2-City"
+      GEOIPUPDATE_FREQUENCY: "8"
+    volumes:
+      - geoip:/usr/share/GeoIP
+
   authentik-worker:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
     container_name: ${PROJECT_NAME}-authentik-worker
@@ -76,6 +90,7 @@ services:
       - ${DOCKER_CONFIG_DIR}/authentik/media:/media
       - ${DOCKER_CONFIG_DIR}/authentik/certs:/certs
       - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
+      - geoip:/geoip
     command: worker
 
   authentik:
@@ -114,6 +129,7 @@ services:
     volumes:
       - ${DOCKER_CONFIG_DIR}/authentik/media:/media
       - ${DOCKER_CONFIG_DIR}/authentik/custom-templates:/templates
+      - geoip:/geoip
     command: server
     labels:
       traefik.enable: true
