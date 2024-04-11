@@ -134,26 +134,8 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.authentik.entrypoints: websecure
-      traefik.http.routers.authentik.rule: Host(`auth.${DOMAIN_NAME}`)
+      traefik.http.routers.authentik.rule: Host(`auth.$DOMAIN_NAME`) || HostRegexp(`{subdomain:[a-z0-9-]+}.$DOMAIN_NAME`) && PathPrefix(`/outpost.goauthentik.io/`)
       traefik.http.services.authentik.loadbalancer.server.port: 9000
-
-  # Manual proxy outpost is not needed probably
-  # We can use the embedded docker outpost
-  # authentik-proxy:
-  #   image: ghcr.io/goauthentik/proxy:${AUTHENTIK_VERSION}
-  #   container_name: ${PROJECT_NAME}-authentik-proxy
-  #   environment:
-  #     AUTHENTIK_HOST: https://auth.${DOMAIN_NAME}
-  #     AUTHENTIK_INSECURE: "false"
-  #     AUTHENTIK_TOKEN: token-generated-by-authentik
-  #     # Starting with 2021.9, you can optionally set this too
-  #     # when authentik_host for internal communication doesn't match the public URL
-  #     # AUTHENTIK_HOST_BROWSER: https://external-domain.tld
-  #   labels:
-  #     traefik.enable: true
-  #     traefik.port: 9000
-  #     traefik.http.routers.authentik.rule: Host(`app.company`) && PathPrefix(`/outpost.goauthentik.io/`)
-  #     # `authentik-proxy` refers to the service name in the compose file.
-  #     traefik.http.middlewares.authentik.forwardauth.address: http://authentik-proxy:9000/outpost.goauthentik.io/auth/traefik
-  #     traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
-  #     traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+      traefik.http.middlewares.authentik.forwardauth.address: http://authentik:9000/outpost.goauthentik.io/auth/traefik
+      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
