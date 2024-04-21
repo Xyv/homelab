@@ -1,0 +1,31 @@
+services:
+  diun:
+    image: ghcr.io/crazy-max/diun:${DIUN_VERSION}
+    container_name: ${PROJECT_NAME}-diun
+    networks:
+      socket_proxy:
+    secrets:
+      - diun_discord_hook
+      # - docker_registry_username
+      # - docker_registry_password
+    command: serve
+    environment:
+      TZ: ${TZ}
+      LOG_LEVEL: info
+      DIUN_DB_PATH: /data/diun.db
+      DIUN_WATCH_WORKERS: 20
+      DIUN_WATCH_SCHEDULE: 0 */12 * * *
+      DIUN_WATCH_JITTER: 30s
+      DIUN_PROVIDERS_DOCKER: true
+      DIUN_PROVIDERS_DOCKER_ENDPOINT: tcp://docker-socket-proxy:2375
+      DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT: false
+      # DIUN_REGOPTS_0_NAME: docker.io
+      # DIUN_REGOPTS_0_SELECTOR: image
+      # DIUN_REGOPTS_0_USERNAMEFILE: /run/secrets/docker_registry_username
+      # DIUN_REGOPTS_0_PASSWORDFILE: /run/secrets/docker_registry_password
+      DIUN_NOTIF_DISCORD_WEBHOOKURL: https://discord.com/api/webhooks/${DIUN_WEBHOOK}
+      DIUN_NOTIF_DISCORD_MENTIONS: "@here"
+      DIUN_NOTIF_DISCORD_RENDERFIELDS: true
+      DIUN_NOTIF_DISCORD_TIMEOUT: 10s
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/diun:/data

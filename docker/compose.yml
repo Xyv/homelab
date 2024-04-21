@@ -55,6 +55,8 @@ secrets:
     file: ${DOCKER_CONFIG_DIR}/secrets/email_user_mailapfr.secrets
   email_password:
     file: ${DOCKER_CONFIG_DIR}/secrets/email_password_mailapfr.secrets
+  diun_discord_hook:
+    file: ${DOCKER_CONFIG_DIR}/secrets/diun_discord_hook
 
 ########################### EXTENSION FIELDS
 # Helps eliminate repetition of sections
@@ -74,6 +76,10 @@ x-security: &common-key-security
 x-common-keys-core: &common-keys-core
   <<: *common-key-security
   restart: always
+  labels:
+    - "diun.enable=true"
+    - "diun.max_tags=4"
+    - "diun.sort_tags=semver"
   profiles:
     - all
     - core
@@ -165,6 +171,12 @@ services:
     extends:
       service: docker-socket-proxy
       file: ./compose/docker-socket-proxy.yml
+    <<: *common-keys-core
+
+  diun:
+    extends:
+      service: diun
+      file: ./compose/diun.yml
     <<: *common-keys-core
 
   protonmail-bridge:
