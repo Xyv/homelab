@@ -123,6 +123,8 @@ services:
       service: traefik
       file: ./compose/traefik.yml
     <<: *common-keys-core
+    depends_on:
+      - docker-socket-proxy
 
   docker-socket-proxy:
     extends:
