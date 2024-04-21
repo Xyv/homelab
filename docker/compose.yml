@@ -1,3 +1,38 @@
+# TODO:
+### ADD BLUEPRINT FOR AUTHENTIK
+### Use syncthing to sync config?
+## Authentik: https://docs.goauthentik.io/docs/providers/proxy/server_traefik
+## LDAP: https://leo.leung.xyz/wiki/FreeIPA
+## Add cockpit for docker/host management
+## Traefik
+##   - Add metrics
+##   - Add tracing
+##   - Add middlewares:
+##     - http headers
+##     - rate limites
+## Protect jellyfin apps behind authentik (requires the user to login from a webbrowser before to whitelist the IP)
+## https://github.com/sam-6174/jellytin/blob/master/docs/jellyfin_client_whitelist.md
+
+# Apps:
+##
+
+# Wireguard + ui
+# DockerGe
+# Sylog grabber/viewer? Datadog?
+# bookstack
+# Homepage
+# Linkstack
+# Paperless
+# PrivateBin
+# MkDocs
+# FreshRSS
+
+# Obsidian
+# Excalidraw
+# Focalboard
+# Joplin
+# Memos
+
 # Define sensitive variables in write protected files (chmod 600) and use then as secrets
 # Makes it possible to share/git the docker-compose.yml file without sharing sensitive data
 # Make sure the secrets folder is added to the .gitignore file
