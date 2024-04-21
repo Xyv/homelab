@@ -9,5 +9,6 @@ services:
       LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
       CONTAINERS: 1
       IMAGES: 1
+      POST: 0 # Disallow any POST operations (effectively read-only)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
