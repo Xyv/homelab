@@ -74,6 +74,7 @@ services:
       - --accessLog.filters.statusCodes=204-299,400-499,500-599 # Don't log successful and redirect connections
     volumes:
       - letsencrypt_certificates:/certs
+      - ${DOCKER_CONFIG_DIR}/traefik/rules:/rules
     labels:
       traefik.enable: true
       traefik.http.routers.traefik.entrypoints: websecure
