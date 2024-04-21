@@ -90,6 +90,10 @@ x-common-keys-authentik: &common-keys-authentik
   restart: always
   networks:
     oauth_backend:
+  labels:
+    - "diun.enable=true"
+    - "diun.max_tags=4"
+    - "diun.sort_tags=semver"
   profiles:
     - all
     - core
@@ -103,6 +107,10 @@ x-common-keys-apps: &common-keys-apps
     proxy:
   environment:
     <<: *default-tz-puid-pgid
+  labels:
+    - "diun.enable=true"
+    - "diun.max_tags=4"
+    - "diun.sort_tags=semver"
   profiles:
     - all
     - apps
