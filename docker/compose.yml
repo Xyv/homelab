@@ -202,6 +202,9 @@ services:
       service: pihole
       file: ./compose/pihole.yml
     <<: *common-keys-core
+    # Pihole requires to run suid/sudo
+    security_opt:
+        - no-new-privileges:false
 
   orbital-sync:
     extends:

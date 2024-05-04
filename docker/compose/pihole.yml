@@ -10,8 +10,6 @@ services:
     secrets:
       - pihole_password
     environment:
-      WEB_UID: ${PUID}
-      WEB_GID: ${PGID}
       PIHOLE_DNS_: 127.0.0.1#5335
       DNSMASQ_LISTENING: all
       REV_SERVER: "true"
