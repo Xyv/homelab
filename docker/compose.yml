@@ -56,7 +56,9 @@ secrets:
   email_password:
     file: ${DOCKER_CONFIG_DIR}/secrets/email_password_mailapfr.secrets
   diun_discord_hook:
-    file: ${DOCKER_CONFIG_DIR}/secrets/diun_discord_hook
+    file: ${DOCKER_CONFIG_DIR}/secrets/diun_discord_hook.secrets
+  pihole_password:
+    file: ${DOCKER_CONFIG_DIR}/secrets/pihole_password.secrets
 
 ########################### EXTENSION FIELDS
 # Helps eliminate repetition of sections
@@ -194,6 +196,12 @@ services:
     <<: *common-keys-core
     networks:
       protonmail_bridge:
+
+  pihole:
+    extends:
+      service: pihole
+      file: ./compose/pihole.yml
+    <<: *common-keys-core
 
   ############### Authentik Services
   authentik-db:

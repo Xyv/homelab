@@ -1,0 +1,33 @@
+services:
+  pihole:
+    image: pluim003/pihole-unbound
+    container_name: ${PROJECT_NAME}-pihole
+    ports:
+      - ${NS1}:53:53 # Allow localhost to be used as a dns resolver
+      - ${NS1}:53:53/udp # Allow localhost to be used as a dns resolver
+    networks:
+      proxy:
+    secrets:
+      - pihole_password
+    environment:
+      WEB_UID: ${PUID}
+      WEB_GID: ${PGID}
+      PIHOLE_DNS_: 127.0.0.1#5335
+      DNSMASQ_LISTENING: all
+      REV_SERVER: "true"
+      REV_SERVER_DOMAIN: local
+      REV_SERVER_TARGET: ${GATEWAY_IP}
+      REV_SERVER_CIDR: ${PIHOLE_CIDR}
+      FTLCONF_LOCAL_IPV4: ${NS1}
+      FTLCONF_RATE_LIMIT: 10000/60
+      DNSSEC: "true"
+      WEBPASSWORD_FILE: /run/secrets/pihole_password
+      WEBTHEME: default-dark
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/pihole/dnsmasq.d:/etc/dnsmasq.d
+      - ${DOCKER_CONFIG_DIR}/pihole/pihole:/etc/pihole
+      - ${DOCKER_CONFIG_DIR}/pihole/unbound_pi-hole.conf:/etc/unbound/unbound.conf.d/pi-hole.conf
+    labels:
+      traefik.enable: true
+      traefik.http.routers.pihole-rtr.entrypoints: websecure
+      traefik.http.services.pihole-svc.loadbalancer.server.port: 80
