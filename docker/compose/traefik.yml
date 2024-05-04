@@ -13,6 +13,10 @@ services:
     environment:
       TZ: ${TZ}
       DUCKDNS_TOKEN_FILE: /run/secrets/duckdns_token
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      UNIFI_CONTROLLER_IP: ${UNIFI_CONTROLLER_IP}
+      NS1: ${NS1}
+      NS2: ${NS2}
     command:
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=false
