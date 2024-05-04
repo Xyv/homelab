@@ -1,1 +1,15 @@
-*.secrets
+# Ignore all config folder
+docker/config/*
+
+# Include some specific files for pihole
+# We have to:
+# - first stop ignore the top pihole folder,
+# - then ignore its content
+# - then allow for the files we want
+!docker/config/pihole/
+docker/config/pihole/*
+!docker/config/pihole/dnsmasq.d
+!docker/config/pihole/unbound_pi-hole.conf
+
+# Include traefik
+!docker/config/traefik/
