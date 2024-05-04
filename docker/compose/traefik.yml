@@ -38,6 +38,8 @@ services:
       # Entrypoints definition
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      - --entrypoints.dns-tcp.address=:53
+      - --entrypoints.dns-udp.address=:53/udp
       # Unifi entrypoints
       - --entrypoints.unifi-inform.address=:8080
       - --entrypoints.unifi-portal.address=:8843

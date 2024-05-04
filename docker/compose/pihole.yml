@@ -2,9 +2,6 @@ services:
   pihole:
     image: pluim003/pihole-unbound
     container_name: ${PROJECT_NAME}-pihole
-    ports:
-      - ${NS1}:53:53 # Allow localhost to be used as a dns resolver
-      - ${NS1}:53:53/udp # Allow localhost to be used as a dns resolver
     networks:
       proxy:
     secrets:
