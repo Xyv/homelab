@@ -212,6 +212,14 @@ services:
       file: ./compose/orbital-sync.yml
     <<: *common-keys-core
 
+  dozzle:
+    extends:
+      service: dozzle
+      file: ./compose/dozzle.yml
+    <<: *common-keys-core
+    depends_on:
+      - docker-socket-proxy
+
   ############### Authentik Services
   authentik-db:
     extends:

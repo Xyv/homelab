@@ -1,0 +1,23 @@
+services:
+  dozzle:
+    image: amir20/dozzle
+    container_name: ${PROJECT_NAME}-dozzle
+    networks:
+      proxy:
+      socket_proxy:
+    environment:
+      TZ: ${TZ}
+      DOZZLE_NO_ANALYTICS: true
+      DOZZLE_HOSTNAME: xcp-docker
+      DOZZLE_LEVEL: info
+      DOZZLE_REMOTE_HOST: tcp://docker-socket-proxy:2375|docker,tcp://${JELLYFIN_IP}:2375|jellyfin
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    labels:
+      traefik.enable: true
+      traefik.http.routers.dozzle-rtr.entrypoints: websecure
+      traefik.http.services.dozzle-svc.loadbalancer.server.port: 8080
