@@ -1,0 +1,19 @@
+http:
+  serversTransports:
+    skip-verify:
+      insecureSkipVerify: true
+
+  routers:
+    xoce-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`xoce.{{env "DOMAIN_NAME"}}`)
+      service: xoce-svc
+
+  services:
+    xoce-svc:
+      loadBalancer:
+        servers:
+        - url: https://{{ env "XOCE_IP" }}
+        serversTransport: skip-verify
+        passHostHeader: true
