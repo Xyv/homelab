@@ -32,6 +32,9 @@ services:
       # Use docker-socket-proxy to avoid exposing the full socket, see https://doc.traefik.io/traefik/providers/docker/#docker-api-access
       - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
       - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.${DOMAIN_NAME}`)
+      # Load rules for non local docker services from files
+      - --providers.file.directory=/rules
+      - --providers.file.watch=true
       # Entrypoints definition
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
