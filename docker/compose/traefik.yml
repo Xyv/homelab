@@ -38,6 +38,12 @@ services:
       # Entrypoints definition
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      # Unifi entrypoints
+      - --entrypoints.unifi-inform.address=:8080
+      - --entrypoints.unifi-portal.address=:8843
+      - --entrypoints.unifi-stun.address=:3478/udp
+      - --entrypoints.unifi-l2-discovery.address=:1900/udp
+      - --entrypoints.unifi-ap-discovery.address=:10001/udp
       # HTTP-to-HTTPS Redirect
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
