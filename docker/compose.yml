@@ -203,6 +203,12 @@ services:
       file: ./compose/pihole.yml
     <<: *common-keys-core
 
+  orbital-sync:
+    extends:
+      service: orbital-sync
+      file: ./compose/orbital-sync.yml
+    <<: *common-keys-core
+
   ############### Authentik Services
   authentik-db:
     extends:
