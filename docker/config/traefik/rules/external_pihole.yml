@@ -1,0 +1,52 @@
+http:
+  routers:
+    # pihole-rtr:
+    #   entryPoints:
+    #   - websecure
+    #   rule: Host(`pihole.{{env "DOMAIN_NAME"}}`)
+    #   service: pihole-svc
+    pihole2-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`pihole2.{{env "DOMAIN_NAME"}}`)
+      service: pihole2-svc
+
+  services:
+    # pihole-svc:
+    #   loadBalancer:
+    #     servers:
+    #     - url: http://{{ env "NS1" }}:80
+    pihole2-svc:
+      loadBalancer:
+        servers:
+        - url: http://{{ env "NS2" }}:8082
+
+# tcp:
+#   routers:
+#     dns-tcp-rtr:
+#       rule: HostSNI(`*`)
+#       # rule: HostSNI(`pihole.{{ env "DOMAIN_NAME" }}`)
+#       entryPoints:
+#         - dns-tcp
+#       service: dns-tcp-svc
+
+#   services:
+#     dns-tcp-svc:
+#       loadBalancer:
+#         servers:
+#           - address: '{{ env "NS1" }}:53'
+#           - address: '{{ env "NS2" }}:53'
+
+# udp:
+#   routers:
+#     dns-udp-rtr:
+#       entryPoints:
+#         - dns-udp
+#       service: dns-udp-svc
+
+#   services:
+#     dns-udp-svc:
+#       loadBalancer:
+#         servers:
+#           - address: '{{ env "NS1" }}:53'
+#           - address: '{{ env "NS2" }}:53'
