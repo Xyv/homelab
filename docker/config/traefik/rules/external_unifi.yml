@@ -1,0 +1,87 @@
+http:
+  serversTransports:
+    skip-verify:
+      insecureSkipVerify: true
+
+  routers:
+    unifi-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`unifi.{{ env "DOMAIN_NAME" }}`)
+      service: unifi-svc
+    unifi-inform-rtr:
+      entryPoints:
+      - unifi-inform
+      rule: Host(`unifi.{{ env "DOMAIN_NAME" }}`) && Path(`/inform`)
+      service: unifi-inform-svc
+    unifi-portal-rtr:
+      entryPoints:
+      - unifi-portal
+      rule: Host(`portal.{{ env "DOMAIN_NAME" }}`)
+      service: unifi-portal-svc
+      tls: true
+
+  services:
+    unifi-svc:
+      loadBalancer:
+        servers:
+        - url: https://{{ env "UNIFI_CONTROLLER_IP" }}:8443
+        serversTransport: skip-verify
+        passHostHeader: true
+    unifi-inform-svc:
+      loadBalancer:
+        servers:
+        - url: http://{{ env "UNIFI_CONTROLLER_IP" }}:8080/inform
+    # This can only work if running on a different IP/or a common docker network
+    # Unifi expects the request to be on 8843 ports, if on same IP there's no way for this to work
+    unifi-portal-svc:
+      loadBalancer:
+        servers:
+        - url: https://{{ env "UNIFI_CONTROLLER_IP" }}:8843
+        serversTransport: skip-verify
+
+udp:
+  routers:
+    unifi-stun-rtr:
+      entrypoints:
+      - unifi-stun
+      service: unifi-stun-svc
+    unifi-ap-discovery-rtr:
+      entrypoints:
+      - unifi-ap-discovery
+      service: unifi-ap-discovery-svc
+    unifi-l2-discovery-rtr:
+      entrypoints:
+      - unifi-l2-discovery
+      service: unifi-l2-discovery-svc
+
+  services:
+    unifi-stun-svc:
+      loadBalancer:
+        servers:
+        - address: '{{ env "UNIFI_CONTROLLER_IP" }}:3478'
+
+    unifi-ap-discovery-svc:
+      loadBalancer:
+        servers:
+        - address: '{{ env "UNIFI_CONTROLLER_IP" }}:10001'
+
+    unifi-l2-discovery-svc:
+      loadBalancer:
+        servers:
+        - address: '{{ env "UNIFI_CONTROLLER_IP" }}:1900'
+
+
+# ### Below sets up the `/inform` route ###
+
+# # Create a new router that matches YOUR.DOMAIN.COM/inform
+# - "traefik.http.routers.unifi-inform.rule=Host(`unifi.mydomain.nl`) && PathPrefix(`/inform`)"
+# - "traefik.http.routers.unifi-inform.entrypoints=unifi-inform"
+
+# - "traefik.http.routers.unifi-infrom.service=inform-service"
+
+# # Forward YOUR.DOMAIN.COM/inform to unifi controller container on 8080
+# - "traefik.http.services.inform-service.loadbalancer.server.port=8080"
+# - "traefik.http.services.inform-service.loadbalancer.server.scheme=web"
+
+# - "traefik.http.routers.unifi-inform.service=inform-service"
