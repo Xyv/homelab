@@ -1,0 +1,15 @@
+http:
+  routers:
+    truenas-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`truenas.{{env "DOMAIN_NAME"}}`)
+      service: truenas-svc
+
+  services:
+    truenas-svc:
+      loadBalancer:
+        servers:
+        - url: https://{{ env "NAS_IP" }}
+        serversTransport: skip-verify
+        passHostHeader: true
