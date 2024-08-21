@@ -22,6 +22,7 @@ services:
       DUCKDNS_TOKEN_FILE: /run/secrets/duckdns_token
       DOMAIN_NAME: ${DOMAIN_NAME}
       UNIFI_CONTROLLER_IP: ${UNIFI_CONTROLLER_IP}
+      XOA_IP: ${XOA_IP}
       XOCE_IP: ${XOCE_IP}
       NAS_IP: ${NAS_IP}
       NS1: ${NS1}
