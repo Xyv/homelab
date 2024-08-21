@@ -74,14 +74,19 @@ x-security: &common-key-security
   security_opt:
     - no-new-privileges
 
+x-diun-labels: &diun-labels
+  - diun.enable: true
+  - diun.watch_repo: true
+  - diun.max_tags: 4
+  - diun.sort_tags: semver
+  - diun.include_tags: ^\\d+\\.\\d+\\..* # Should match both semver/date versionning
+
 # Keys common to some of the core services that we always to automatically restart on failure
 x-common-keys-core: &common-keys-core
   <<: *common-key-security
   restart: always
   labels:
-    - "diun.enable=true"
-    - "diun.max_tags=4"
-    - "diun.sort_tags=semver"
+   <<: *diun-labels
   profiles:
     - all
     - core
@@ -93,9 +98,7 @@ x-common-keys-authentik: &common-keys-authentik
   networks:
     oauth_backend:
   labels:
-    - "diun.enable=true"
-    - "diun.max_tags=4"
-    - "diun.sort_tags=semver"
+   <<: *diun-labels
   profiles:
     - all
     - core
@@ -108,9 +111,7 @@ x-common-keys-apps-backend: &common-keys-apps-backend
   environment:
     <<: *default-tz-puid-pgid
   labels:
-    - "diun.enable=true"
-    - "diun.max_tags=4"
-    - "diun.sort_tags=semver"
+   <<: *diun-labels
   profiles:
     - all
     - apps
