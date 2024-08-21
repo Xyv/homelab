@@ -1,19 +1,26 @@
 http:
-  serversTransports:
-    skip-verify:
-      insecureSkipVerify: true
-
   routers:
     xoce-rtr:
       entryPoints:
       - websecure
       rule: Host(`xoce.{{env "DOMAIN_NAME"}}`)
       service: xoce-svc
+    xoa-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`xoa.{{env "DOMAIN_NAME"}}`)
+      service: xoa-svc
 
   services:
     xoce-svc:
       loadBalancer:
         servers:
         - url: https://{{ env "XOCE_IP" }}
+        serversTransport: skip-verify
+        passHostHeader: true
+    xoa-svc:
+      loadBalancer:
+        servers:
+        - url: https://{{ env "XOA_IP" }}
         serversTransport: skip-verify
         passHostHeader: true
