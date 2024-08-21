@@ -14,4 +14,4 @@ config/pihole/dnsmasq.d/*
 !config/pihole/unbound_pi-hole.conf
 
 # Include traefik
-!docker/config/traefik/
+!config/traefik/
