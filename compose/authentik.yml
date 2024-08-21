@@ -14,7 +14,11 @@ services:
       - authentik_database:/var/lib/postgresql/data
     shm_size: 128mb
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $$(cat $${POSTGRES_DB_FILE}) -U $$(cat $${POSTGRES_USER_FILE})"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d $$(cat $${POSTGRES_DB_FILE}) -U $$(cat $${POSTGRES_USER_FILE})",
+        ]
       start_period: 20s
       interval: 10s
       retries: 5
