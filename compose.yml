@@ -102,11 +102,9 @@ x-common-keys-authentik: &common-keys-authentik
     - authentik
 
 # Keys common to some of the dependent services/apps
-x-common-keys-apps: &common-keys-apps
+x-common-keys-apps-backend: &common-keys-apps-backend
   <<: *common-key-security
   restart: unless-stopped
-  networks:
-    proxy:
   environment:
     <<: *default-tz-puid-pgid
   labels:
@@ -117,10 +115,16 @@ x-common-keys-apps: &common-keys-apps
     - all
     - apps
 
+# Add the proxy network for apps to be reachable behind traefik
+x-common-keys-apps: &common-keys-apps
+  <<: *common-keys-apps-backend
+  networks:
+    proxy:
+
 # Keys common to some of the services in media-services.txt
 x-common-keys-media: &common-keys-media
   <<: *common-key-security
-  restart: "no"
+  restart: unless-stopped
   networks:
     proxy:
   environment:
@@ -146,14 +150,24 @@ networks:
 volumes:
   letsencrypt_certificates:
     name: letsencrypt_certificates
+    external:
+      true
   protonmail:
     name: protonmail
+    external:
+      true
   authentik_database:
     name: authentik_database
+    external:
+      true
   authentik_redis:
     name: authentik_redis
+    external:
+      true
   geoip:
     name: authentik_geoip
+    external:
+      true
   nfs_books:
     driver: local
     name: books    # this is the name of the volume in /var/lib/docker/volumes
