@@ -1,0 +1,15 @@
+http:
+  routers:
+    snipeit-rtr:
+      entryPoints:
+      - websecure
+      rule: Host(`snipeit.{{env "DOMAIN_NAME"}}`)
+      service: snipeit-svc
+
+  services:
+    snipeit-svc:
+      loadBalancer:
+        servers:
+        - url: https://snipeit
+        serversTransport: skip-verify
+        passHostHeader: true

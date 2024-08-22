@@ -1,0 +1,60 @@
+services:
+  snipe-db:
+    image: lscr.io/linuxserver/mariadb:${SNIPEIT_MARIA_VERSION}
+    container_name: ${PROJECT_NAME}-snipeit-db
+    secrets:
+    - snipeit_db_name
+    - snipeit_db_user
+    - snipeit_db_password
+    environment:
+      FILE__MYSQL_DATABASE: /run/secrets/snipeit_db_name
+      FILE__MYSQL_USER: /run/secrets/snipeit_db_user
+      FILE__MYSQL_PASSWORD: /run/secrets/snipeit_db_password
+      FILE__MYSQL_ROOT_PASSWORD: /run/secrets/snipeit_db_password
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/snipeit/db:/config:rw
+    networks:
+      snipeit:
+
+  snipeit:
+    image: lscr.io/linuxserver/snipe-it:${SNIPEIT_VERSION}
+    container_name: ${PROJECT_NAME}-snipeit
+    secrets:
+      - snipeit_db_name
+      - snipeit_db_user
+      - snipeit_db_password
+      - snipeit_app_key
+    networks:
+      proxy:
+      snipeit:
+    depends_on:
+      - snipe-db
+    environment:
+      # Snipe-it
+      APP_URL: https://snipeit.${DOMAIN_NAME}
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_TIMEZONE: ${TZ}
+      APP_LOCALE: fr-FR
+      APP_TRUSTED_PROXIES: ${REVERSE_PROXY_IP}
+      SECURE_COOKIES: true
+      APP_KEY: /run/secrets/snipeit_app_key
+      # Database connection
+      MYSQL_PORT_3306_TCP_ADDR: snipe-db
+      MYSQL_PORT_3306_TCP_PORT: 3306
+      FILE__MYSQL_DATABASE: /run/secrets/snipeit_db_name
+      FILE__MYSQL_USER: /run/secrets/snipeit_db_user
+      FILE__MYSQL_PASSWORD: /run/secrets/snipeit_db_password
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/snipeit/snipeit:/config:rw
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail https://snipeit.${DOMAIN_NAME}/health | exit 1"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    # We set the rtr/svc in a file for easier configuration, since it needs to use https + skipVerify + etc.
+    # labels:
+    #   traefik.enable: true
+    #   traefik.http.routers.snipeit-rtr.entrypoints: websecure
+    #   traefik.http.services.snipeit-svc.loadbalancer.server.port: 80

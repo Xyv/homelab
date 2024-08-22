@@ -59,6 +59,14 @@ secrets:
     file: ${DOCKER_CONFIG_DIR}/secrets/diun_discord_hook.secrets
   pihole_password:
     file: ${DOCKER_CONFIG_DIR}/secrets/pihole_password.secrets
+  # snipeit_db_name:
+  #   file: ${DOCKER_CONFIG_DIR}/secrets/snipeit_db_name.secrets
+  # snipeit_db_user:
+  #   file: ${DOCKER_CONFIG_DIR}/secrets/snipeit_db_user.secrets
+  # snipeit_db_password:
+  #   file: ${DOCKER_CONFIG_DIR}/secrets/snipeit_db_password.secrets
+  # snipeit_app_key:
+  #   file: ${DOCKER_CONFIG_DIR}/secrets/snipeit_app_key.secrets
 
 ########################### EXTENSION FIELDS
 # Helps eliminate repetition of sections
@@ -142,6 +150,8 @@ networks:
   oauth_backend:
     # Authentication backend
     name: oauth_backend
+  snipeit:
+    name: snipeit
 
 volumes:
   letsencrypt_certificates:
@@ -299,6 +309,21 @@ services:
       service: calibre-web
       file: ./compose/calibre.yml
     <<: *common-keys-apps
+
+  ## TODO: Add snipeit
+  #snipeit:
+  #  extends:
+  #    service: snipeit
+  #    file: ./compose/snipeit.yml
+  #  <<: *common-keys-apps
+
+  # snipe-db:
+  #   extends:
+  #     service: snipe-db
+  #     file: ./compose/snipeit.yml
+  #   <<: *common-keys-apps-backend
+  #   networks:
+  #     snipeit:
 
   ############### MEDIA Services
   prowlarr:
