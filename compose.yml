@@ -75,18 +75,17 @@ x-security: &common-key-security
     - no-new-privileges
 
 x-diun-labels: &diun-labels
-  - diun.enable: true
-  - diun.watch_repo: true
-  - diun.max_tags: 4
-  - diun.sort_tags: semver
-  - diun.include_tags: ^\\d+\\.\\d+\\..* # Should match both semver/date versionning
+  diun.enable: true
+  diun.watch_repo: true
+  diun.max_tags: 4
+  diun.sort_tags: semver
+  diun.include_tags: ^v?\\d+\\.\\d+\\.\\d+ # Should match 1.2.3, v1.2.3 and 2024.01.02
 
 # Keys common to some of the core services that we always to automatically restart on failure
 x-common-keys-core: &common-keys-core
   <<: *common-key-security
   restart: always
-  labels:
-   <<: *diun-labels
+  labels: *diun-labels
   profiles:
     - all
     - core
@@ -97,8 +96,7 @@ x-common-keys-authentik: &common-keys-authentik
   restart: always
   networks:
     oauth_backend:
-  labels:
-   <<: *diun-labels
+  labels: *diun-labels
   profiles:
     - all
     - core
@@ -108,10 +106,8 @@ x-common-keys-authentik: &common-keys-authentik
 x-common-keys-apps-backend: &common-keys-apps-backend
   <<: *common-key-security
   restart: unless-stopped
-  environment:
-    <<: *default-tz-puid-pgid
-  labels:
-   <<: *diun-labels
+  environment: *default-tz-puid-pgid
+  labels: *diun-labels
   profiles:
     - all
     - apps
@@ -128,8 +124,7 @@ x-common-keys-media: &common-keys-media
   restart: unless-stopped
   networks:
     proxy:
-  environment:
-    <<: *default-tz-puid-pgid
+  environment: *default-tz-puid-pgid
   profiles:
     - all
     - media
@@ -189,6 +184,10 @@ services:
       service: traefik
       file: ./compose/traefik.yml
     <<: *common-keys-core
+    labels:
+      # Note: We have to reuse the fragments here, as redefining labels with totally override the section
+      <<: *diun-labels
+      diun.include_tags: ^\\d+\\.\\d+ # Should match 1.2
     depends_on:
       - docker-socket-proxy
 
@@ -209,6 +208,9 @@ services:
       service: protonmail-bridge
       file: ./compose/protonmail-bridge.yml
     <<: *common-keys-core
+    labels:
+      <<: *diun-labels
+      diun.include_tags: ^\\d+\\.\\d+\\.\\d+(-\\d+)?$ # Should match 1.2.3 and 1.2.3-4
     networks:
       protonmail_bridge:
 
@@ -247,6 +249,9 @@ services:
       service: authentik-redis
       file: ./compose/authentik.yml
     <<: *common-keys-authentik
+    labels:
+      <<: *diun-labels
+      diun.include_tags: \\d+-alpine$ # matche 7-alpine
 
   authentik-worker:
     extends:
