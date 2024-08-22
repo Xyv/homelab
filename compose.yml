@@ -1,5 +1,8 @@
 # TODO:
+### Rootless docker: https://docs.docker.com/engine/security/rootless/#distribution-specific-hint
 ### ADD BLUEPRINT FOR AUTHENTIK
+### Configure password recovery : https://www.youtube.com/watch?v=NKJkYz0BIlA
+### Configure invitation link
 ### Use syncthing to sync config?
 ## Authentik: https://docs.goauthentik.io/docs/providers/proxy/server_traefik
 ## LDAP: https://leo.leung.xyz/wiki/FreeIPA
@@ -16,6 +19,7 @@
 # Apps:
 ##
 
+# Rework jellyfin setup
 # Wireguard + ui
 # DockerGe
 # Sylog grabber/viewer? Datadog?
