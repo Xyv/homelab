@@ -1,6 +1,6 @@
 services:
   docker-socket-proxy:
-    image: lscr.io/linuxserver/socket-proxy:${SOCKET_PROXY}
+    image: lscr.io/linuxserver/socket-proxy:${SOCKET_PROXY_VERSION}
     container_name: ${PROJECT_NAME}-docker-socket-proxy
     networks:
       socket_proxy:
