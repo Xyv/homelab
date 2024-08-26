@@ -97,6 +97,7 @@ services:
       - --accessLog=true
       # - --accessLog.bufferingSize=100 # Only useful when logging to file, keep buffersingSize in RAM before saving to disk
       - --accessLog.filters.statusCodes=204-299,400-499,500-599 # Don't log successful and redirect connections
+      - --accesslog.fields.names.StartUTC=drop # Log with local time
     volumes:
       - letsencrypt_certificates:/certs
       - ${DOCKER_CONFIG_DIR}/traefik/rules:/rules
