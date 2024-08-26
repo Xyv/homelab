@@ -201,10 +201,7 @@ services:
       service: traefik
       file: ./compose/traefik.yml
     <<: *common-keys-core
-    labels:
-      # Note: We have to reuse the fragments here, as redefining labels with totally override the section
-      <<: *diun-labels
-      diun.include_tags: "^\\d+\\.\\d+" # Should match 1.2
+    labels: *diun-labels
     depends_on:
       - docker-socket-proxy
 
@@ -228,6 +225,7 @@ services:
       file: ./compose/protonmail-bridge.yml
     <<: *common-keys-core
     labels:
+      # Note: We have to reuse the fragments here, as redefining labels with totally override the section
       <<: *diun-labels
       diun.include_tags: "^\\d+\\.\\d+\\.\\d+(-\\d+)?$" # Should match 1.2.3 and 1.2.3-4
     networks:
