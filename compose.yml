@@ -87,11 +87,8 @@ x-security: &common-key-security
     - no-new-privileges
 
 x-diun-labels: &diun-labels
-  diun.enable: true
-  diun.watch_repo: true
-  diun.max_tags: 4
-  diun.sort_tags: semver
-  diun.include_tags: ^v?\\d+\\.\\d+\\.\\d+ # Should match 1.2.3, v1.2.3 and 2024.01.02
+  diun.enable: "true"
+  diun.watch_repo: "true"
 
 # Keys common to some of the core services that we always to automatically restart on failure
 x-common-keys-core: &common-keys-core
@@ -207,7 +204,7 @@ services:
     labels:
       # Note: We have to reuse the fragments here, as redefining labels with totally override the section
       <<: *diun-labels
-      diun.include_tags: ^\\d+\\.\\d+ # Should match 1.2
+      diun.include_tags: "^\\d+\\.\\d+" # Should match 1.2
     depends_on:
       - docker-socket-proxy
 
@@ -230,7 +227,7 @@ services:
     <<: *common-keys-core
     labels:
       <<: *diun-labels
-      diun.include_tags: ^\\d+\\.\\d+\\.\\d+(-\\d+)?$ # Should match 1.2.3 and 1.2.3-4
+      diun.include_tags: "^\\d+\\.\\d+\\.\\d+(-\\d+)?$" # Should match 1.2.3 and 1.2.3-4
     networks:
       protonmail_bridge:
 
@@ -271,7 +268,7 @@ services:
     <<: *common-keys-authentik
     labels:
       <<: *diun-labels
-      diun.include_tags: \\d+-alpine$ # matche 7-alpine
+      diun.include_tags: "^\\d+-alpine$" # matche 7-alpine
 
   authentik-worker:
     extends:
