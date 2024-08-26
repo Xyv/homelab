@@ -219,6 +219,8 @@ services:
       service: diun
       file: ./compose/diun.yml
     <<: *common-keys-core
+    depends_on:
+      - docker-socket-proxy
 
   protonmail-bridge:
     extends:
