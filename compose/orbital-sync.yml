@@ -11,3 +11,5 @@ services:
       # SECONDARY_HOSTS_1_BASE_URL: https://pihole-xcp.${DOMAIN_NAME}
       SECONDARY_HOSTS_1_BASE_URL: https://pihole-xcp.pingaula.eu
       SECONDARY_HOSTS_1_PASSWORD_FILE: /run/secrets/pihole_password
+      SECONDARY_HOSTS_2_BASE_URL: https://rpihole.pingaula.eu
+      SECONDARY_HOSTS_2_PASSWORD_FILE: /run/secrets/pihole_password
