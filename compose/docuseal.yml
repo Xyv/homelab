@@ -1,0 +1,56 @@
+services:
+  # Propose a PR in docuseal to add support for secrets in docker compose
+  # https://github.com/docker-library/postgres/blob/805329e7a64fad212a5d4b07abd11238a9beab75/16/bookworm/Dockerfile#L190
+  # https://github.com/docker-library/postgres/blob/805329e7a64fad212a5d4b07abd11238a9beab75/16/bookworm/docker-entrypoint.sh#L9
+  docuseal:
+    image: docuseal/docuseal:${DOCUSEAL_VERSION}
+    container_name: ${PROJECT_NAME}-docuseal
+    networks:
+      docuseal-backend:
+    secrets:
+      - docuseal_db_name
+      - docuseal_db_user
+      - docuseal_db_password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/docuseal_db_name
+      POSTGRES_USER_FILE: /run/secrets/docuseal_db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/docuseal_db_password
+      FORCE_SSL: ${DOMAIN_NAME}
+      DATABASE_HOST: docuseal-db
+      DATABASE_PORT: 5432
+      DATABASE_USER: REPLACE_ME
+      DATABASE_PASSWORD: REPLACE_ME
+      DATABASE_NAME: REPLACE_ME
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/docuseal/app:/data/docuseal
+    depends_on:
+      docuseal-db:
+        condition: service_healthy
+    labels:
+      traefik.enable: true
+      traefik.http.routers.docuseal-rtr.entrypoints: websecure
+      traefik.http.services.docuseal-svc.loadbalancer.server.port: 3000
+
+  docuseal-db:
+    image: docker.io/library/postgres:${DOCUSEAL_PG_VERSION}
+    container_name: ${PROJECT_NAME}-docuseal-db
+    secrets:
+      - docuseal_db_name
+      - docuseal_db_user
+      - docuseal_db_password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/docuseal_db_name
+      POSTGRES_USER_FILE: /run/secrets/docuseal_db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/docuseal_db_password
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/docuseal/db:/var/lib/postgresql/data
+    shm_size: 128mb
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d $$(cat $${POSTGRES_DB_FILE}) -U $$(cat $${POSTGRES_USER_FILE})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

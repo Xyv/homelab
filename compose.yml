@@ -63,6 +63,12 @@ secrets:
     file: ${DOCKER_CONFIG_DIR}/secrets/diun_discord_hook.secrets
   pihole_password:
     file: ${DOCKER_CONFIG_DIR}/secrets/pihole_password.secrets
+  docuseal_db_name:
+    file: ${DOCKER_CONFIG_DIR}/secrets/docuseal_db_name.secrets
+  docuseal_db_user:
+    file: ${DOCKER_CONFIG_DIR}/secrets/docuseal_db_user.secrets
+  docuseal_db_password:
+    file: ${DOCKER_CONFIG_DIR}/secrets/docuseal_db_password.secrets
   # snipeit_db_name:
   #   file: ${DOCKER_CONFIG_DIR}/secrets/snipeit_db_name.secrets
   # snipeit_db_user:
@@ -153,6 +159,9 @@ networks:
     name: oauth_backend
   snipeit:
     name: snipeit
+  # DB connection for docuseal
+  docuseal-backend:
+    name: docuseal-backend
 
 volumes:
   letsencrypt_certificates:
@@ -314,6 +323,23 @@ services:
       service: calibre-web
       file: ./compose/calibre.yml
     <<: *common-keys-apps
+
+  docuseal:
+    extends:
+      service: docuseal
+      file: ./compose/docuseal.yml
+    <<: *common-keys-apps
+    networks:
+      docuseal-backend:
+      proxy:
+
+  docuseal-db:
+    extends:
+      service: docuseal-db
+      file: ./compose/docuseal.yml
+    <<: *common-keys-apps
+    networks:
+      docuseal-backend:
 
   ## TODO: Add snipeit
   #snipeit:
