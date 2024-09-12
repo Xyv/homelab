@@ -1,0 +1,37 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:${OPEN_WEBUI_VERSION}
+    container_name: ${PROJECT_NAME}-open-webui
+    networks:
+      llm-backend:
+      proxy:
+    # secrets:
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    labels:
+      traefik.enable: true
+      traefik.http.routers.openwebui-rtr.entrypoints: websecure
+      traefik.http.services.openwebui-svc.loadbalancer.server.port: 8080
+
+
+  ollama:
+    image: ollama/ollama:${OLLAMA_VERSION}
+    container_name: ${PROJECT_NAME}-ollama
+    networks:
+      llm-backend:
+    volumes:
+      - ollama:/root/.ollama
+    devices:
+      - /dev/dri
+    labels:
+      traefik.enable: true
+      traefik.http.routers.ollama-rtr.entrypoints: websecure
+      traefik.http.services.ollama-svc.loadbalancer.server.port: 11434
+    deploy:
+      resources:
+        limits:
+          memory: 16G

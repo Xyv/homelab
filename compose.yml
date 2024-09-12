@@ -144,6 +144,15 @@ x-common-keys-media: &common-keys-media
     - all
     - media
 
+# Keys common to some of the services in media-services.txt
+x-common-keys-llm: &common-keys-llm
+  <<: *common-key-security
+  restart: unless-stopped
+  environment: *default-tz-puid-pgid
+  profiles:
+    - all
+    - llm
+
 networks:
   default:
   proxy:
@@ -162,6 +171,9 @@ networks:
   # DB connection for docuseal
   docuseal-backend:
     name: docuseal-backend
+  # Connect webui frontend to llm
+  llm-backend:
+    name: llm-backend
 
 volumes:
   letsencrypt_certificates:
@@ -197,6 +209,10 @@ volumes:
       type: nfs
       o: nfsvers=4,addr=${NAS_IP},rw
       device: ":${BOOKS_DIR}"
+  open-webui:
+    name: open-webui
+  ollama:
+    name: ollama
 
 services:
   ############### CORE Services
@@ -370,3 +386,16 @@ services:
     <<: *common-keys-media
     depends_on:
       - prowlarr
+
+  ############### LLM
+  open-webui:
+    extends:
+      service: open-webui
+      file: ./compose/ollama.yml
+    <<: *common-keys-llm
+
+  ollama:
+    extends:
+      service: ollama
+      file: ./compose/ollama.yml
+    <<: *common-keys-llm
