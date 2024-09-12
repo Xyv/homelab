@@ -16,10 +16,10 @@ services:
       DIUN_WATCH_WORKERS: 10
       DIUN_WATCH_SCHEDULE: 0 */12 * * *
       DIUN_WATCH_JITTER: 30s
-      DIUN_DEFAULTS_MAXTAGS: 4
+      DIUN_DEFAULTS_MAXTAGS: 10 
       DIUN_DEFAULTS_INCLUDETAGS: ^v?\d+\.\d+\.\d+$ # Should match 1.2.3, v1.2.3 and 2024.01.02
       DIUN_DEFAULTS_EXCLUDETAGS: dev
-      DIUN_DEFAULTS_SORTTAGS: semver # default reverse
+      # DIUN_DEFAULTS_SORTTAGS: semver # default reverse
       DIUN_WATCH_FIRSTCHECKNOTIF: true
       DIUN_WATCH_RUNONSTARTUP: true
       DIUN_PROVIDERS_DOCKER: true
